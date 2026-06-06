@@ -1,0 +1,87 @@
+# 1. Two Sum
+
+**Difficulty:** 🟢 Easy
+
+**Topic:** HashMap
+
+---
+
+## Problem Statement
+
+Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.
+
+---
+
+## Example
+
+### Input
+
+```python
+nums = [2,7,11,15]
+target = 9
+```
+
+### Output
+
+```python
+[0,1]
+```
+
+---
+
+## Approach
+
+We use a HashMap to store previously visited numbers and their indices.
+
+For every number:
+
+1. Calculate the complement.
+2. Check if the complement already exists.
+3. If found, return the indices.
+4. Otherwise store the current value.
+
+---
+
+## Python Solution
+
+```python
+class Solution:
+    def twoSum(self, nums, target):
+        hashmap = {}
+
+        for i in range(len(nums)):
+            complement = target - nums[i]
+
+            if complement in hashmap:
+                return [hashmap[complement], i]
+
+            hashmap[nums[i]] = i
+```
+
+---
+
+## Complexity Analysis
+
+| Metric | Complexity |
+| ------ | ---------- |
+| Time   | O(n)       |
+| Space  | O(n)       |
+
+---
+
+## Key Takeaway
+
+Whenever a problem requires:
+
+* Fast lookups
+* Finding pairs
+* Target sums
+
+Consider using a HashMap to reduce time complexity from O(n²) to O(n).
+
+---
+
+### Tags
+
+`#Array` `#HashMap` `#LeetCode`
+
