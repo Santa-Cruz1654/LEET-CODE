@@ -1,0 +1,451 @@
+# 19. Remove Nth Node From End of List
+
+**Difficulty:** 🟡 Medium
+
+**Topics:** Linked List, Two Pointers, Fast & Slow Pointer
+
+---
+
+# Problem Statement
+
+Given the `head` of a linked list, remove the **nth node from the end** of the list and return the head of the modified list.
+
+---
+
+# Approach
+
+We use the **Two Pointer** technique.
+
+The main idea is to keep two pointers:
+
+- `i` → points to the node **before the node we want to remove**.
+- `j` → stays `n` nodes ahead of `i`.
+
+To handle the case where we need to remove the **first node**, we create a **dummy node** before the head.
+
+```text
+dummy → 1 → 2 → 3 → 4 → 5
+```
+
+Then both pointers start at the dummy node.
+
+---
+
+# Why Do We Need a Dummy Node?
+
+Consider:
+
+```text
+1 → 2 → 3
+```
+
+and:
+
+```text
+n = 3
+```
+
+We need to remove:
+
+```text
+1
+```
+
+Without a dummy node, there is no node before `1` whose `next` we can change.
+
+With a dummy:
+
+```text
+dummy → 1 → 2 → 3
+```
+
+Now we can simply do:
+
+```python
+i.next = i.next.next
+```
+
+when `i` is at `dummy`.
+
+This makes the edge case much easier.
+
+---
+
+# Idea
+
+### Step 1: Create Dummy Node
+
+```python
+dummy = ListNode(0)
+dummy.next = head
+```
+
+Now:
+
+```text
+dummy → 1 → 2 → 3 → 4 → 5
+```
+
+---
+
+### Step 2: Initialize Two Pointers
+
+```python
+i = dummy
+j = dummy
+```
+
+Both start at the same position.
+
+---
+
+### Step 3: Move `j` Forward `n` Steps
+
+```python
+for _ in range(n):
+    j = j.next
+```
+
+This creates a gap of `n` nodes between `i` and `j`.
+
+For:
+
+```text
+n = 2
+```
+
+we get:
+
+```text
+dummy → 1 → 2 → 3 → 4 → 5
+  ↑              ↑
+  i              j
+```
+
+---
+
+### Step 4: Move Both Pointers
+
+Now move both pointers together:
+
+```python
+while j.next:
+    i = i.next
+    j = j.next
+```
+
+Because `j` is always `n` nodes ahead of `i`, when `j` reaches the end:
+
+```text
+i
+↓
+3 → 4 → 5
+```
+
+`i` is positioned at the **node before the node we want to remove**.
+
+For:
+
+```text
+1 → 2 → 3 → 4 → 5
+n = 2
+```
+
+we have:
+
+```text
+1 → 2 → 3 → 4 → 5
+         ↑
+         i
+```
+
+The node after `i` is `4`, which is the 2nd node from the end.
+
+---
+
+### Step 5: Remove the Node
+
+We skip the node:
+
+```python
+i.next = i.next.next
+```
+
+Before:
+
+```text
+3 → 4 → 5
+    ↑
+   remove
+```
+
+After:
+
+```text
+3 → 5
+```
+
+---
+
+# Dry Run
+
+### Input
+
+```python
+head = [1,2,3,4,5]
+n = 2
+```
+
+Initial:
+
+```text
+dummy → 1 → 2 → 3 → 4 → 5
+  ↑
+ i,j
+```
+
+Move `j` two steps:
+
+```text
+dummy → 1 → 2 → 3 → 4 → 5
+  ↑          ↑
+  i          j
+```
+
+Now move both until `j.next` is `None`.
+
+Eventually:
+
+```text
+dummy → 1 → 2 → 3 → 4 → 5
+              ↑       ↑
+              i       j
+```
+
+`i` is at node `3`.
+
+The node to remove is:
+
+```text
+i.next = 4
+```
+
+Remove it:
+
+```python
+i.next = i.next.next
+```
+
+Result:
+
+```text
+1 → 2 → 3 → 5
+```
+
+---
+
+# Python Solution
+
+```python
+class Solution:
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+
+        dummy = ListNode(0)
+        dummy.next = head
+
+        i = dummy
+        j = dummy
+
+        for _ in range(n):
+            j = j.next
+
+        while j.next:
+            i = i.next
+            j = j.next
+
+        i.next = i.next.next
+
+        return dummy.next
+```
+
+---
+
+# Complexity Analysis
+
+| Metric | Complexity |
+|---------|------------|
+| Time Complexity | **O(n)** |
+| Space Complexity | **O(1)** |
+
+### Why?
+
+The fast pointer and slow pointer traverse the linked list once.
+
+We don't store the nodes in an array or use any other data structure.
+
+Only:
+
+```text
+dummy
+i
+j
+```
+
+are used.
+
+Therefore:
+
+```text
+Time  → O(n)
+Space → O(1)
+```
+
+---
+
+# Important Part to Remember
+
+The most important trick is:
+
+```python
+dummy = ListNode(0)
+dummy.next = head
+```
+
+and then:
+
+```python
+i = dummy
+j = dummy
+```
+
+Move `j` exactly `n` steps ahead:
+
+```python
+for _ in range(n):
+    j = j.next
+```
+
+Then move both together:
+
+```python
+while j.next:
+    i = i.next
+    j = j.next
+```
+
+Finally:
+
+```python
+i.next = i.next.next
+```
+
+---
+
+# Why `while j.next` Instead of `while j`?
+
+This is important.
+
+We want `i` to stop at the **node immediately before the node being removed**.
+
+Using:
+
+```python
+while j.next:
+```
+
+ensures that when the loop finishes, `j` is at the **last node**.
+
+Therefore `i` is exactly where we need it.
+
+---
+
+# Edge Case: Removing the Head
+
+### Input
+
+```python
+head = [1]
+n = 1
+```
+
+Initially:
+
+```text
+dummy → 1
+  ↑
+ i,j
+```
+
+Move `j` one step:
+
+```text
+dummy → 1
+        ↑
+        j
+```
+
+`j.next` is `None`, so the loop doesn't execute.
+
+Therefore:
+
+```python
+i.next = i.next.next
+```
+
+becomes:
+
+```text
+dummy → None
+```
+
+Finally:
+
+```python
+return dummy.next
+```
+
+returns:
+
+```text
+None
+```
+
+Correct.
+
+---
+
+# Interview Takeaway
+
+Whenever a linked-list problem asks for:
+
+- Nth node from the end
+- Kth node from the end
+- Removing a node based on its position from the end
+
+Think:
+
+**Two Pointers + Fixed Gap**
+
+The general pattern is:
+
+```python
+i = dummy
+j = dummy
+
+# Create a gap
+for _ in range(n):
+    j = j.next
+
+# Move together
+while j.next:
+    i = i.next
+    j = j.next
+
+# Modify using i
+i.next = i.next.next
+```
+
+The key idea is:
+
+> **Keep the two pointers `n` nodes apart. When the second pointer reaches the end, the first pointer is exactly where we need it.**
+```
