@@ -1,0 +1,371 @@
+# 75. Sort Colors
+
+**Difficulty:** 🟡 Medium
+
+**Topics:** Array, Two Pointers, Sorting, Dutch National Flag
+
+---
+
+# Problem Statement
+
+Given an array `nums` containing only:
+
+```text
+0, 1, 2
+```
+
+sort the array **in-place** so that:
+
+```text
+0s → 1s → 2s
+```
+
+You cannot use the library's built-in sorting function.
+
+---
+
+# Approach
+
+We use the **Dutch National Flag Algorithm** with three pointers:
+
+- `low` → position where the next `0` should go.
+- `mid` → current element being examined.
+- `high` → position where the next `2` should go.
+
+The array is divided into four regions:
+
+```text
+[ 0s | 1s | unknown | 2s ]
+       ↑        ↑       ↑
+      low      mid     high
+```
+
+Our goal is to eliminate the **unknown** region.
+
+---
+
+# Idea
+
+There are only three possible values.
+
+### Case 1: `nums[mid] == 0`
+
+A `0` belongs at the beginning.
+
+Swap it with `nums[low]`.
+
+```python
+nums[low], nums[mid] = nums[mid], nums[low]
+```
+
+Then move both:
+
+```python
+low += 1
+mid += 1
+```
+
+---
+
+### Case 2: `nums[mid] == 1`
+
+`1` is already in the correct middle region.
+
+Simply move:
+
+```python
+mid += 1
+```
+
+---
+
+### Case 3: `nums[mid] == 2`
+
+A `2` belongs at the end.
+
+Swap it with `nums[high]`.
+
+```python
+nums[mid], nums[high] = nums[high], nums[mid]
+```
+
+Then:
+
+```python
+high -= 1
+```
+
+**Important:** We do **not** increment `mid` here.
+
+Why?
+
+Because the element that comes from `high` into `mid` has not been examined yet.
+
+---
+
+# Dry Run
+
+### Input
+
+```python
+nums = [2,0,2,1,1,0]
+```
+
+Initial:
+
+```text
+low = 0
+mid = 0
+high = 5
+
+[2, 0, 2, 1, 1, 0]
+ ↑              ↑
+mid            high
+```
+
+---
+
+### Step 1
+
+`nums[mid] = 2`
+
+Swap with `high`:
+
+```text
+[0, 0, 2, 1, 1, 2]
+```
+
+Move:
+
+```text
+high = 4
+```
+
+`mid` stays at `0`.
+
+---
+
+### Step 2
+
+`nums[mid] = 0`
+
+Swap with `low`:
+
+```text
+[0, 0, 2, 1, 1, 2]
+```
+
+Move:
+
+```text
+low = 1
+mid = 1
+```
+
+---
+
+### Step 3
+
+`nums[mid] = 0`
+
+Move:
+
+```text
+low = 2
+mid = 2
+```
+
+---
+
+### Step 4
+
+`nums[mid] = 2`
+
+Swap with `high`:
+
+```text
+[0, 0, 1, 1, 2, 2]
+```
+
+Move:
+
+```text
+high = 3
+```
+
+Again, `mid` does not move.
+
+---
+
+### Step 5
+
+`nums[mid] = 1`
+
+Simply:
+
+```text
+mid += 1
+```
+
+Now:
+
+```text
+mid = 3
+```
+
+---
+
+### Step 6
+
+`nums[mid] = 1`
+
+```text
+mid += 1
+```
+
+Now:
+
+```text
+mid = 4
+```
+
+Since:
+
+```text
+mid > high
+```
+
+we stop.
+
+Final array:
+
+```python
+[0,0,1,1,2,2]
+```
+
+---
+
+# Python Solution
+
+```python
+class Solution:
+    def sortColors(self, nums: list[int]) -> None:
+
+        low = 0
+        mid = 0
+        high = len(nums) - 1
+
+        while mid <= high:
+
+            if nums[mid] == 0:
+
+                nums[low], nums[mid] = nums[mid], nums[low]
+
+                low += 1
+                mid += 1
+
+            elif nums[mid] == 1:
+
+                mid += 1
+
+            else:
+
+                nums[mid], nums[high] = nums[high], nums[mid]
+
+                high -= 1
+```
+
+---
+
+# Complexity Analysis
+
+| Metric | Complexity |
+|---------|------------|
+| Time Complexity | **O(n)** |
+| Space Complexity | **O(1)** |
+
+### Why?
+
+Every element is processed at most a constant number of times.
+
+We never create another array.
+
+Therefore:
+
+```text
+Time  → O(n)
+Space → O(1)
+```
+
+This satisfies the requirement of sorting the array **in-place** without using the built-in `sort()` function.
+
+---
+
+# The Most Important Part
+
+Remember this distinction:
+
+### When we see `0`
+
+```python
+swap(low, mid)
+
+low += 1
+mid += 1
+```
+
+Both move because the element swapped into `mid` is already known to be `0`.
+
+### When we see `1`
+
+```python
+mid += 1
+```
+
+It's already in the correct region.
+
+### When we see `2`
+
+```python
+swap(mid, high)
+
+high -= 1
+```
+
+**Do not increment `mid`.**
+
+The incoming element from `high` is unknown and needs to be processed.
+
+---
+
+# Interview Takeaway
+
+Whenever you see an array containing **three categories** that need to be grouped in order, think of the:
+
+**Dutch National Flag Algorithm**
+
+The standard pattern is:
+
+```python
+low = 0
+mid = 0
+high = len(nums) - 1
+
+while mid <= high:
+
+    if nums[mid] == 0:
+        swap(low, mid)
+        low += 1
+        mid += 1
+
+    elif nums[mid] == 1:
+        mid += 1
+
+    else:
+        swap(mid, high)
+        high -= 1
+```
+
+The key insight to remember is:
+
+> **`mid` only moves when the element at `mid` has been completely processed.**
